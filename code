@@ -1,0 +1,380 @@
+# EXPLORATORY DATA ANALYSIS
+
+# Load the dataset and apply to dataframe
+
+spotify_songs <- read_csv("spotify_songs.csv")
+
+# view dataset
+
+view(spotify_songs)
+
+# 23 columns seems more durable to get a feeling
+# Note: Possible RQs: Track popularity, Which artist has most popular song, release date, something over time, playlist genre, cluster
+
+# Get no. of genres
+
+count(distinct(spotify_songs, playlist_genre))
+
+# 6 genres. 
+# Use distinct to tell which:
+
+distinct(spotify_songs, playlist_genre)
+
+# Genres:
+# 1 pop           
+# 2 rap           
+# 3 rock          
+# 4 latin         
+# 5 r&b           
+# 6 edm
+
+# Get subgenres
+
+distinct(spotify_songs, playlist_subgenre)
+
+# Apply to dataframe
+
+subgenres<-distinct(spotify_songs, playlist_subgenre)
+
+# View subsgenres
+
+view(subgenres)
+
+# Note: Could we cross popularity with music genres and take all the songs in a genre and take the average of their popularity?
+
+# Arrange df by track_popularity
+
+arrange(spotify_songs, track_popularity, desc=TRUE)
+
+# Not working. Move track pop into desc function.
+
+arrange(spotify_songs, desc(track_popularity))
+
+# Works. Look at the most popular songs, we notice that some of the songs repeat, i.e. they are probably part of multiple playlist, we need to filter for this.
+
+arrange(spotify_songs, desc(track_artist))
+
+
+
+# Need to see most popular artist
+
+
+
+# APPROACH 1:
+
+deduped_songs <- spotify_songs[!duplicated(spotify_songs$track_id), ] #deduplicate rows by track id, we lose the playlist information doing this, but that is acceptable
+
+
+artists_by_popularity <- deduped_songs %>% # create new dataframe for our artists by mean popularity of their songs
+  group_by(track_artist) %>% #group on the artist name
+  summarise(count_tracks=n(), #add column with number of tracks the mean popularity is based on, to see if an artist is a one hit wonder, or more consistant
+            min_popularity=min(track_popularity), #add column showing the popularity of the least popular song
+            mean_popularity=mean(track_popularity), #add column with mean popularity of all the songs by that particular artist
+            max_popularity=max(track_popularity)) %>% #add column showing the popularity of the most popular song
+  arrange(desc(mean_popularity)) #arrange descending by mean popularity
+view(artists_by_popularity) #view or new dataset
+
+
+
+# APPROACH 2:
+
+view(spotify_songs) #look at the original dataset to choose a variable
+
+ggplot(data=spotify_songs, mapping=aes(x=danceability,y=track_popularity))+geom_point()+
+  theme_minimal() #nice plot, we observe that a very high concentration of songs in general have a danceability of more than .5
+
+
+# View spotify_songs again and extract the other variables
+
+#1	danceability - we did this already
+#2	energy
+#3	key
+#4	loudness
+#5	mode
+#6	speechiness
+#7	acousticness
+#8	instrumentalness
+#9	liveness
+#10	valence
+#11	tempo
+
+# Look at the other variables with ggplot
+
+# 2	energy
+ggplot(data=spotify_songs, mapping=aes(x=energy,y=track_popularity))+geom_point()+
+  theme_minimal() 
+
+# Look at no. 11: Tempo
+ggplot(data=spotify_songs, mapping=aes(x=tempo,y=track_popularity))+geom_point()+
+  theme_minimal() 
+
+# 3	key
+ggplot(data=spotify_songs, mapping=aes(x=key,y=track_popularity))+geom_point()+
+  theme_minimal() 
+
+# 4	loudness
+ggplot(data=spotify_songs, mapping=aes(x=loudness,y=track_popularity))+geom_point()+
+  theme_minimal() 
+
+# 5 mode
+ggplot(data=spotify_songs, mapping=aes(x=mode,y=track_popularity))+geom_point()+
+  theme_minimal() 
+
+# 6	speechiness
+ggplot(data=spotify_songs, mapping=aes(x=speechiness,y=track_popularity))+geom_point()+
+  theme_minimal() 
+
+# 7	acousticness
+ggplot(data=spotify_songs, mapping=aes(x=acousticness,y=track_popularity))+geom_point()+
+  theme_minimal() 
+
+# 8	instrumentalness
+ggplot(data=spotify_songs, mapping=aes(x=instrumentalness,y=track_popularity))+geom_point()+
+  theme_minimal() 
+
+# 9	liveness
+ggplot(data=spotify_songs, mapping=aes(x=liveness,y=track_popularity))+geom_point()+
+  theme_minimal() 
+
+# 10	valence
+ggplot(data=spotify_songs, mapping=aes(x=valence,y=track_popularity))+geom_point()+
+  theme_minimal() 
+
+# 11	tempo
+# did this already
+
+
+# Note: Had some trouble viewing spotify_songs and all the code below.
+# clean the environment and re-read the spotify_songs dataset anew below.
+
+
+
+# ETA APPROACH 3: TRENDS OVER TIME (1.6)
+
+install.packages("gridExtra")
+
+# Load required packages
+library(tidyverse)
+library(lubridate)
+library(gridExtra)
+
+# Read in the spotify_songs dataset
+spotify_songs <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-01-21/spotify_songs.csv')
+
+# Convert track_album_release_date to a date format
+spotify_songs <- spotify_songs %>%
+  mutate(track_album_release_date = ymd(track_album_release_date))
+
+# This converts all the observations with just years til NA, which we confirm by viewing the new spotify_songs data frame
+view(spotify_songs)
+
+# Create a function that generates the plot for each variable
+plot_by_date <- function(variable) {
+  ggplot(spotify_songs, aes(x = track_album_release_date, y = !!sym(variable), group = 1)) +
+    geom_line(color = "#0072B2") +
+    scale_x_date(date_breaks = "5 years", date_labels = "%Y") +
+    labs(x = "Release Date", y = variable, title = paste("Trends in", variable)) +
+    theme_bw() +
+    theme(plot.title = element_text(face = "bold", size = 14),
+          axis.text = element_text(size = 12),
+          axis.title = element_text(size = 14, face = "bold"))
+}
+
+# Use the function to generate a plot for each variable
+plot_danceability <- plot_by_date("danceability")
+plot_energy <- plot_by_date("energy")
+plot_loudness <- plot_by_date("loudness")
+plot_speechiness <- plot_by_date("speechiness")
+plot_acousticness <- plot_by_date("acousticness")
+plot_instrumentalness <- plot_by_date("instrumentalness")
+plot_liveness <- plot_by_date("liveness")
+plot_valence <- plot_by_date("valence")
+plot_tempo <- plot_by_date("tempo")
+
+# Arrange the plots into a grid
+grid.arrange(plot_danceability, plot_energy, plot_loudness, plot_speechiness,
+             plot_acousticness, plot_instrumentalness, plot_liveness, plot_valence,
+             plot_tempo, ncol = 3)
+
+
+
+
+
+
+
+
+
+
+###CLUSTER ANALYSIS###
+
+library(factoextra)
+library(dplyr)
+library(ggplot2)
+library(tidyverse)
+library(cluster)
+library(tidyr)
+library(stats)
+
+
+
+# Get the Data
+spotify_songs <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-01-21/spotify_songs.csv')
+
+# Select relevant columns
+spotify_songs <- spotify_songs %>%
+  select(track_popularity, playlist_genre, danceability, energy, loudness, speechiness, acousticness, instrumentalness, liveness, valence, tempo)
+
+# Scale the audio features
+spotify_songs_scaled <- spotify_songs %>%
+  select(danceability, energy, loudness, speechiness, acousticness, instrumentalness, liveness, valence, tempo) %>%
+  scale()
+
+# Run K-means clustering
+set.seed(123) # for reproducibility
+k <- 5 # number of clusters
+km <- kmeans(spotify_songs_scaled, centers = k, nstart = 25)
+
+# Add cluster assignments back to the original data
+spotify_songs_clustered <- spotify_songs %>%
+  mutate(cluster = km$cluster)
+
+# Visualize clusters by genre and popularity
+fviz_cluster(list(data = spotify_songs_scaled, cluster = km$cluster),
+             geom = "point",
+             stand = FALSE,
+             frame.type = "norm",
+             ellipse.type = "t",
+             main = "K-means Clustering of Audio Features by Genre and Popularity")
+
+# Aggregate data by cluster and summarize
+spotify_songs_summary <- spotify_songs_clustered %>%
+  group_by(cluster) %>%
+  summarise_all(mean)
+
+# Visualize mean values by cluster
+spotify_songs_summary %>%
+  pivot_longer(cols = -cluster, names_to = "variable", values_to = "value") %>%
+  ggplot(aes(x = cluster, y = value, fill = variable)) +
+  geom_col(position = "dodge") +
+  labs(title = "Mean Values of Audio Features by Cluster",
+       x = "Cluster",
+       y = "Mean Value",
+       fill = "Audio Feature")
+
+
+
+
+
+
+
+
+
+
+###PCA ANALYSIS###
+
+library(factoextra)
+library(dplyr)
+library(ggplot2)
+library(tidyverse)
+library(cluster)
+library(tidyr)
+library(stats)
+
+# Get the Data
+spotify_songs <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-01-21/spotify_songs.csv')
+
+# Select relevant columns
+spotify_songs <- spotify_songs %>%
+  select(track_popularity, playlist_genre, danceability, energy, loudness, speechiness, acousticness, instrumentalness, liveness, valence, tempo)
+
+# Scale the audio features
+spotify_songs_scaled <- spotify_songs %>%
+  select(danceability, energy, loudness, speechiness, acousticness, instrumentalness, liveness, valence, tempo) %>%
+  scale()
+
+# Apply PCA to the scaled audio features
+set.seed(123) # for reproducibility
+pca <- prcomp(spotify_songs_scaled, center = TRUE, scale. = TRUE)
+
+# Get the first two principal components
+PC1 <- pca$x[, 1]
+PC2 <- pca$x[, 2]
+
+# Combine the PCs with the original data
+spotify_songs_clustered <- spotify_songs %>%
+  mutate(PC1 = PC1, PC2 = PC2) %>%
+  # Run K-means clustering
+  select(-playlist_genre, -track_popularity) %>%
+  scale() %>%
+  kmeans(centers = 5, nstart = 25) %>%
+  # Add cluster assignments back to the original data
+  .$cluster %>%
+  as.data.frame() %>%
+  rename(cluster = '.') %>%
+  bind_cols(spotify_songs)
+
+# Visualize clusters by genre and popularity
+ggplot(spotify_songs_clustered, aes(x = PC1, y = PC2, color = factor(cluster))) +
+  geom_point() +
+  facet_grid(playlist_genre~track_popularity, scales = "free") +
+  ggtitle("PCA of Audio Features by Genre and Popularity") +
+  xlab(paste("PC1 (", round(pca$sdev[1]/sum(pca$sdev)*100, 1), "%)", sep = "")) +
+  ylab(paste("PC2 (", round(pca$sdev[2]/sum(pca$sdev)*100, 1), "%)", sep = ""))
+
+# PC1 and PC2 are the first two principal components obtained after performing PCA on the audio features data. 
+# Principal components are new variables that are linear combinations of the original variables that capture the maximum amount
+# of variation in the data. In this case, the audio features were scaled and PCA was performed to reduce the dimensionality 
+# of the data and to enable visualization of the clusters. PC1 and PC2 are the two components that explain the most variation 
+# in the data.
+
+
+
+
+
+
+
+
+
+
+###OLS ANALYSIS###
+
+# Load the necessary libraries
+library(readr)
+library(forecast)
+library(tidyverse)
+library(ggplot2)
+
+# Load the dataset
+spotify_songs <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-01-21/spotify_songs.csv')
+
+# Fit the OLS regression model
+model <- lm(track_popularity ~ danceability + speechiness, data = spotify_songs)
+
+# Create a data frame with new values of danceability and speechiness
+new_data <- data.frame(danceability = seq(0, 1, by = 0.1),
+                       speechiness = seq(0, 1, by = 0.1))
+
+# Make predictions using the predict function, including confidence intervals
+predictions <- predict(model, newdata = new_data, interval = "confidence", level = 0.95)
+
+
+# Check significance of variables
+summary(model)
+
+# Check for autocorrelation in residuals
+acf(resid(model))
+
+# Add predicted values and confidence intervals to the new_data data frame
+new_data$predicted <- predictions[, 1]
+new_data$lower <- predictions[, 2]
+new_data$upper <- predictions[, 3]
+
+# Plot the results
+
+ggplot(new_data, aes(x = danceability, y = predicted)) +
+  geom_line(color = "red", size = 1) +
+  geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.2, fill = "red") +
+  ggtitle("Predicted Track Popularity by Danceability and Speechiness") +
+  xlab("Model") +
+  ylab("Predicted Track Popularity") +
+  theme_minimal()
