@@ -1,4 +1,41 @@
-# EXPLORATORY DATA ANALYSIS
+# REQUIRED PACKAGES TO RUN THIS R-SCRIPT PROPERLY
+
+install.packages("readr")
+install.packages("tidyverse")
+install.packages("gridExtra")
+install.packages("lubridate")
+install.packages("factoextra")
+install.packages("dplyr")
+install.packages("ggplot2")
+install.packages("cluster")
+install.packages("tidyr")
+install.packages("stats")
+install.packages("forecast")
+
+install.packages("tidymodels")
+require(tidymodels) #required to run the library function
+
+# Each library function is provided before the relevant section but also here:
+
+library(readr)
+library(tidyverse)
+library(gridExtra)
+library(lubridate)
+library(factoextra)
+library(dplyr)
+library(ggplot2)
+library(cluster)
+library(tidyr)
+library(stats)
+library(forecast)
+
+
+
+# EXPLORATORY DATA ANALYSIS: Variables (1.3)
+
+# Load required packages
+library(readr)
+library(tidyverse)
 
 # Load the dataset and apply to dataframe
 
@@ -60,7 +97,7 @@ arrange(spotify_songs, desc(track_artist))
 
 
 
-# APPROACH 1:
+# ETA APPROACH 1: Most popular artist (1.4)
 
 deduped_songs <- spotify_songs[!duplicated(spotify_songs$track_id), ] #deduplicate rows by track id, we lose the playlist information doing this, but that is acceptable
 
@@ -76,7 +113,7 @@ view(artists_by_popularity) #view or new dataset
 
 
 
-# APPROACH 2:
+# ETA APPROACH 2: Audio features by track_popularity (1.5)
 
 view(spotify_songs) #look at the original dataset to choose a variable
 
@@ -149,11 +186,11 @@ ggplot(data=spotify_songs, mapping=aes(x=valence,y=track_popularity))+geom_point
 
 
 
-# ETA APPROACH 3: TRENDS OVER TIME (1.6)
+# ETA APPROACH 3: Trends over time (1.6)
 
-install.packages("gridExtra")
 
 # Load required packages
+library(readr)
 library(tidyverse)
 library(lubridate)
 library(gridExtra)
@@ -205,8 +242,9 @@ grid.arrange(plot_danceability, plot_energy, plot_loudness, plot_speechiness,
 
 
 
-###CLUSTER ANALYSIS###
+# CLUSTER ANALYSIS (2.1.2)
 
+library(readr)
 library(factoextra)
 library(dplyr)
 library(ggplot2)
@@ -270,8 +308,9 @@ spotify_songs_summary %>%
 
 
 
-###PCA ANALYSIS###
+# PCA ANALYSIS (2.2.2)
 
+library(readr)
 library(factoextra)
 library(dplyr)
 library(ggplot2)
@@ -336,7 +375,7 @@ ggplot(spotify_songs_clustered, aes(x = PC1, y = PC2, color = factor(cluster))) 
 
 
 
-###OLS ANALYSIS###
+# OLS REGRESSION ANALYSIS (3.2)
 
 # Load the necessary libraries
 library(readr)
