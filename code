@@ -1,4 +1,4 @@
-# REQUIRED PACKAGES TO RUN THIS R-SCRIPT PROPERLY
+#REQUIRED PACKAGES TO RUN THIS R-SCRIPT PROPERLY
 
 install.packages("readr")
 install.packages("tidyverse")
@@ -15,7 +15,7 @@ install.packages("forecast")
 install.packages("tidymodels")
 require(tidymodels) #required to run the library function
 
-# Each library function is provided before the relevant section but also here:
+# Each library() function is provided before the relevant section but also here:
 
 library(readr)
 library(tidyverse)
@@ -33,7 +33,7 @@ library(forecast)
 
 # EXPLORATORY DATA ANALYSIS: Variables (1.3)
 
-# Load required packages
+# Load the necessary packages
 library(readr)
 library(tidyverse)
 
@@ -188,8 +188,7 @@ ggplot(data=spotify_songs, mapping=aes(x=valence,y=track_popularity))+geom_point
 
 # ETA APPROACH 3: Trends over time (1.6)
 
-
-# Load required packages
+# Load the necessary packages
 library(readr)
 library(tidyverse)
 library(lubridate)
@@ -244,6 +243,7 @@ grid.arrange(plot_danceability, plot_energy, plot_loudness, plot_speechiness,
 
 # CLUSTER ANALYSIS (2.1.2)
 
+# Load the necessary packages
 library(readr)
 library(factoextra)
 library(dplyr)
@@ -310,6 +310,7 @@ spotify_songs_summary %>%
 
 # PCA ANALYSIS (2.2.2)
 
+# Load the necessary packages
 library(readr)
 library(factoextra)
 library(dplyr)
@@ -377,7 +378,7 @@ ggplot(spotify_songs_clustered, aes(x = PC1, y = PC2, color = factor(cluster))) 
 
 # OLS REGRESSION ANALYSIS (3.2)
 
-# Load the necessary libraries
+# Load the necessary packages
 library(readr)
 library(forecast)
 library(tidyverse)
@@ -409,7 +410,6 @@ new_data$lower <- predictions[, 2]
 new_data$upper <- predictions[, 3]
 
 # Plot the results
-
 ggplot(new_data, aes(x = danceability, y = predicted)) +
   geom_line(color = "red", size = 1) +
   geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.2, fill = "red") +
