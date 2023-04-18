@@ -1,4 +1,4 @@
-#REQUIRED PACKAGES TO RUN THIS R-SCRIPT PROPERLY
+# REQUIRED PACKAGES TO RUN THIS R-SCRIPT PROPERLY
 
 install.packages("readr")
 install.packages("tidyverse")
@@ -13,7 +13,7 @@ install.packages("stats")
 install.packages("forecast")
 
 install.packages("tidymodels")
-require(tidymodels) #required to run the library function
+require(tidymodels)
 
 # Each library() function is provided before the relevant section but also here:
 
