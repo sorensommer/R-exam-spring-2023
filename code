@@ -417,3 +417,4 @@ ggplot(new_data, aes(x = danceability, y = predicted)) +
   xlab("Model") +
   ylab("Predicted Track Popularity") +
   theme_minimal()
+
